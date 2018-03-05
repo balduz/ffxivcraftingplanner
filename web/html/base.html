@@ -1,0 +1,124 @@
+{{define "base"}}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+    <!-- And my CSS -->
+    <link rel="stylesheet" href="/web/assets/css/main.css" />
+
+    <title>ADD SOMETHING ELSE</title>
+
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark py-3">
+      <a class="navbar-brand" href="#">FFXIV Crafting Planner</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Crafting</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Gathering
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="#">Unspoiled nodes</a>
+              <a class="dropdown-item" href="#">Ephemeral nodes</a>
+              <a class="dropdown-item" href="#">Legendary nodes</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <form class="form-inline" onsubmit="return false">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </nav>
+    <main role="main" class="container">
+      <div class="starter-template">
+        <h3 class="text-primary">Crafting Route</h3>
+        <p class="lead">Save time and gil by planning the best route.<br></p>
+        <form id="item-search-form" class="form-inline">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Search</button>
+        </form>
+
+        <div class="mt-4">
+          <p>
+            Add all the items you wish to craft, and see all the required materials in the <strong>Required Mats</strong> tab.
+            If you make a mistake, you can always edit your crafting list in the <strong>Current Crafting List</strong> tab.
+          </p>
+        </div>
+
+        <ul class="nav nav-pills mb-3 nav-justified" id="pills-tab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">
+              Search Results
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">
+              Current Crafting List
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">
+              Required Mats
+            </a>
+          </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+          <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+            <div class="container">
+              {{template  "search-results" .}}
+            </div>
+          </div>
+          <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+            <div class="container">
+              <div id="crafting-list" class="d-flex flex-column text-light rounded">
+                <div class ="row align-items-center font-weight-bold custom-striped-table py-2 border border-secondary">
+                  <div class="col text-left">Icon</div>
+                  <div class="col text-left">Item</div>
+                  <div class="col text-left">Quantity</div>
+                  <div class="col text-left">Where</div>
+                  <div class="col text-left"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+            <div class="container">
+              <div id="gathering-mats-list" class="d-flex flex-column text-light rounded">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5">
+
+      </div>
+    </main><!-- /.container -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+
+    <!-- My JS functions -->
+    <script src="/web/assets/js/functions.js" ></script>
+  </body>
+</html>
+{{end}}

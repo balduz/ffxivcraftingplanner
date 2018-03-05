@@ -1,0 +1,17 @@
+.container {
+  margin-top: 2rem;
+}
+
+.custom-striped-table {
+  background-color: #212529;
+  border-color: #32383e !important;
+}
+
+.custom-striped-table:nth-child(even) {
+  background-color: #2C3034;
+}
+
+.row {
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
