@@ -76,12 +76,12 @@ func (cl *craftingList) visitTree(n *treeNode, quantity int) {
 	newQuantity := quantity * n.requiredQuantity
 	if val, ok := cl.ingredients[n.id]; ok {
 		val.IncreaseQuantity(newQuantity)
+	} else {
+		i := NewIngredient(n)
+		i.SetValue(n)
+		cl.ingredients[n.id] = i
 	}
 
-	i := NewIngredient(n)
-	i.SetValue(n)
-
-	cl.ingredients[n.id] = i
 	for _, child := range n.children {
 		cl.visitTree(child, newQuantity)
 	}

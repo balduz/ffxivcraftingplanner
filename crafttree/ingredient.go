@@ -5,14 +5,12 @@ import (
 )
 
 type FinalIngredient interface {
-	GetValue() interface{}
 	SetValue(*treeNode)
 	IncreaseQuantity(int)
 }
 
 func (c *Crystal) IncreaseQuantity(q int) { c.Quantity += q }
 func (c *Crystal) SetValue(n *treeNode)   {}
-func (c *Crystal) GetValue() interface{}  { return nil }
 
 func (c *PreCraft) IncreaseQuantity(q int) { c.Quantity += q }
 func (c *PreCraft) SetValue(n *treeNode) {
@@ -28,8 +26,6 @@ func (c *PreCraft) SetValue(n *treeNode) {
 	c.Classes = cs
 }
 
-func (c *PreCraft) GetValue() interface{} { return nil }
-
 func (c *GatheringIngredient) IncreaseQuantity(q int) { c.Quantity += q }
 func (c *GatheringIngredient) SetValue(n *treeNode) {
 	c.Type = &GatheringType{
@@ -37,7 +33,6 @@ func (c *GatheringIngredient) SetValue(n *treeNode) {
 		Name: n.gatheringValue.gatherType.name,
 	}
 }
-func (c *GatheringIngredient) GetValue() interface{} { return nil }
 
 func (c *OtherIngredient) IncreaseQuantity(q int) { c.Quantity += q }
 func (c *OtherIngredient) SetValue(n *treeNode) {
@@ -60,7 +55,6 @@ func (c *OtherIngredient) SetValue(n *treeNode) {
 
 	c.Obtain = oms
 }
-func (c *OtherIngredient) GetValue() interface{} { return nil }
 
 func NewIngredient(n *treeNode) FinalIngredient {
 	ing := &Ingredient{
