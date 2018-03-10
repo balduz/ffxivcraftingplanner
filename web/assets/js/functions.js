@@ -13,7 +13,6 @@ addToCraftingListFunction = function(e) {
       $('#gathering-mats-list').append(data);
 
       $('.ingredients-modal').click(function() {
-        alert('1');
         $('#exampleModalCenter').modal();
       });
     });

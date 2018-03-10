@@ -6,28 +6,6 @@ import (
 	"log"
 )
 
-type obtainData struct {
-	name      string
-	locations []*location
-	currency  string
-}
-
-type obtainMethod struct {
-	data       []*obtainData
-	obtainType ObtainType
-}
-
-type position struct {
-	x float32
-	y float32
-}
-
-type location struct {
-	mapName    string
-	regionName string
-	position   *position
-}
-
 type craftingClass struct {
 	class *class
 	level int
@@ -101,37 +79,20 @@ func buildOtherNode(i *xivdb.Item) *otherNode {
 	var obtainMethods []*obtainMethod
 
 	if len(i.Enemies) > 0 {
-		o := &obtainMethod{
-			obtainType: ENEMY,
+		if enemyObtain, err := getEnemyObtainMethod(i); err == nil {
+			obtainMethods = append(obtainMethods, enemyObtain)
+		} else {
+			log.Fatalf("buildOtherNode(%d): error retrieving enemies %v", i.ID, err)
 		}
-		var obtainDataArray []*obtainData
-		for _, enemy := range i.Enemies {
-			e, err := xivdb.GetEnemy(enemy.ID)
-			if err != nil {
-				log.Printf("could not retrieve enemy with id %d, error %s", enemy.ID, err)
-				continue
-			}
-			var locations []*location
-			for _, p := range e.MapData.Points {
-				locations = append(locations, &location{
-					mapName:    p.PlacenameName,
-					regionName: p.RegionName,
-					position: &position{
-						x: p.Position.Position.X,
-						y: p.Position.Position.Y,
-					},
-				})
-			}
-
-			od := &obtainData{
-				name:      enemy.Name,
-				locations: locations,
-			}
-			obtainDataArray = append(obtainDataArray, od)
-		}
-		o.data = obtainDataArray
-		obtainMethods = append(obtainMethods, o)
 	}
+	if len(i.Shops) > 0 {
+		if shopsObtain, err := getShopsObtainMethod(i); err == nil {
+			obtainMethods = append(obtainMethods, shopsObtain)
+		} else {
+			log.Fatalf("buildOtherNode(%d): error retrieving shops %v", i.ID, err)
+		}
+	}
+
 	return &otherNode{
 		obtainMethods: obtainMethods,
 	}

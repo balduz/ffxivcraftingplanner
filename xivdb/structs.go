@@ -18,14 +18,13 @@ type Item struct {
 	PriceLow       int `json:"price_low"`
 	PriceMid       int `json:"price_mid"`
 	Quests         []*Quest
-	//Shops          []*shop
-	SpecialShops []*SpecialShop `json:"special_shops_obtain"`
+	Shops          []*Shop
+	SpecialShops   []*SpecialShop `json:"special_shops_obtain"`
 }
 
 type Enemy struct {
-	Icon    string
 	ID      int
-	MapData *MapData `json:"map_data"`
+	MapData json.RawMessage `json:"map_data"`
 	//MapPrimary *mapPrimary `json:"map_primary"`
 	Name string
 }
@@ -90,13 +89,13 @@ type Leve struct {
 
 type Shop struct {
 	Name string
-	Npc  *Npc
+	Npc  json.RawMessage
 }
 
 type Npc struct {
-	Name       string
-	MapData    *MapData    `json:"map_data"`
-	MapPrimary *MapPrimary `json:"map_primary"`
+	Name    string
+	MapData json.RawMessage `json:"map_data"`
+	//MapPrimary *MapPrimary `json:"map_primary"`
 }
 
 type SpecialShop struct {

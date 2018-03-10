@@ -13,7 +13,7 @@ func FuncMap() template.FuncMap {
 			case crafttree.ENEMY:
 				return "/web/assets/icons/enemy_drop.png"
 			case crafttree.NPC:
-				return "a"
+				return "/web/assets/icons/gil.png"
 			}
 			return "a"
 		},
