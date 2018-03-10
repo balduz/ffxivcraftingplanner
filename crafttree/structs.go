@@ -61,6 +61,7 @@ type CrafterClass struct {
 type PreCraft struct {
 	*Ingredient
 	Classes []*CrafterClass
+	Obtain  []*ObtainMethod
 }
 
 type GatheringType struct {
@@ -70,7 +71,8 @@ type GatheringType struct {
 
 type GatheringIngredient struct {
 	*Ingredient
-	Type *GatheringType
+	Type   *GatheringType
+	Obtain []*ObtainMethod
 }
 
 type OtherIngredient struct {

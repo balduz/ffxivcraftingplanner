@@ -19,7 +19,7 @@ func BuildCraftingList(w http.ResponseWriter, s string) error {
 
 	cl := crafttree.GetCraftingListFor([]int{r.Item.ID})
 
-	t, err := template.New("webpage").Funcs(helper.FuncMap()).ParseFiles("web/html/precrafts-table.tmpl")
+	t, err := template.New("webpage").Funcs(helper.FuncMap()).ParseFiles("web/html/precrafts-table.tmpl", "web/html/other-obtain-methods.tmpl")
 	if err != nil {
 		return err
 	}

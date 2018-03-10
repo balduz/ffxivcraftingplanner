@@ -24,6 +24,27 @@ func (c *PreCraft) SetValue(n *treeNode) {
 	}
 	log.Printf("setting value for precraft with ID %d, classes: %v", n.id, cs)
 	c.Classes = cs
+
+	if n.otherValue != nil {
+		var oms []*ObtainMethod
+		for _, o := range n.otherValue.obtainMethods {
+
+			var od []*ObtainMethodData
+			for _, data := range o.data {
+				od = append(od, &ObtainMethodData{
+					Name:      data.name,
+					Locations: data.locations,
+				})
+			}
+
+			oms = append(oms, &ObtainMethod{
+				Data: od,
+				Type: o.obtainType,
+			})
+		}
+
+		c.Obtain = oms
+	}
 }
 
 func (c *GatheringIngredient) IncreaseQuantity(q int) { c.Quantity += q }
@@ -31,6 +52,27 @@ func (c *GatheringIngredient) SetValue(n *treeNode) {
 	c.Type = &GatheringType{
 		Icon: n.gatheringValue.gatherType.icon,
 		Name: n.gatheringValue.gatherType.name,
+	}
+
+	if n.otherValue != nil {
+		var oms []*ObtainMethod
+		for _, o := range n.otherValue.obtainMethods {
+
+			var od []*ObtainMethodData
+			for _, data := range o.data {
+				od = append(od, &ObtainMethodData{
+					Name:      data.name,
+					Locations: data.locations,
+				})
+			}
+
+			oms = append(oms, &ObtainMethod{
+				Data: od,
+				Type: o.obtainType,
+			})
+		}
+
+		c.Obtain = oms
 	}
 }
 
@@ -69,10 +111,10 @@ func NewIngredient(n *treeNode) FinalIngredient {
 		return &Crystal{ing}
 	}
 	if n.craftingValue != nil {
-		return &PreCraft{ing, nil}
+		return &PreCraft{ing, nil, nil}
 	}
 	if n.gatheringValue != nil {
-		return &GatheringIngredient{ing, nil}
+		return &GatheringIngredient{ing, nil, nil}
 	}
 	return &OtherIngredient{ing, nil}
 }
