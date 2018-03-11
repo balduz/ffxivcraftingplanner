@@ -35,7 +35,7 @@ $('#item-search-form').on('submit', function(e) {
   var $input = $('#item-search-form :input').first();
   const val = $input.val();
 
-  $('#search-results-list').parent().load('/search', {"search": val}, function() {
+  $('#search-results-list').load('/search', {"search": val}, function() {
     $('#search-results-list .btn-primary').click(addToCraftingListFunction)
     // TODO(cbalduz): check whether I need to do something here or not, like an error message.
   });

@@ -15,7 +15,7 @@ func FuncMap() template.FuncMap {
 			case crafttree.NPC:
 				return "/web/assets/icons/gil.png"
 			}
-			return "a"
+			return "nope"
 		},
 	}
 }
