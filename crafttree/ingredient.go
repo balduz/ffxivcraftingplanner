@@ -1,104 +1,102 @@
 package crafttree
 
-import (
-	"log"
-)
-
-type FinalIngredient interface {
-	SetValue(*treeNode)
-	IncreaseQuantity(int)
+type Ingredient struct {
+	ID       int
+	Icon     string
+	Name     string
+	Quantity int
 }
 
-func (c *Crystal) IncreaseQuantity(q int) { c.Quantity += q }
-func (c *Crystal) SetValue(n *treeNode)   {}
+type ObtainMethodData struct {
+	Name      string
+	Locations []*location
+}
 
-func (c *PreCraft) IncreaseQuantity(q int) { c.Quantity += q }
-func (c *PreCraft) SetValue(n *treeNode) {
+type ObtainMethod struct {
+	Data []*ObtainMethodData
+	Type ObtainType
+	// TODO: add for shops!
+}
+
+type Crystal struct {
+	*Ingredient
+}
+
+type CrafterClass struct {
+	Name  string
+	Level int
+	Icon  string
+}
+
+type PreCraft struct {
+	*Ingredient
+	Classes []*CrafterClass
+	Obtain  []*ObtainMethod
+}
+
+type GatheringType struct {
+	Name string
+	Icon string
+}
+
+type GatheringIngredient struct {
+	*Ingredient
+	Type   *GatheringType
+	Obtain []*ObtainMethod
+}
+
+type OtherIngredient struct {
+	*Ingredient
+	Obtain []*ObtainMethod
+}
+
+type ingredient interface {
+	setValue(*treeNode)
+	increaseQuantity(int)
+}
+
+func (ing *Ingredient) increaseQuantity(q int) {
+	ing.Quantity += q
+}
+
+func (c *Crystal) setValue(n *treeNode) {
+	// TODO: is there anything to be done with crystals?
+}
+
+func (c *PreCraft) setValue(n *treeNode) {
 	var cs []*CrafterClass
 	for _, c := range n.craftingValue.classes {
 		cs = append(cs, &CrafterClass{
 			Level: n.craftingValue.recipeLevel,
-			Name:  c.class.name,
-			Icon:  c.class.icon,
+			Name:  c.class.Name,
+			Icon:  c.class.Icon,
 		})
 	}
-	log.Printf("setting value for precraft with ID %d, classes: %v", n.id, cs)
 	c.Classes = cs
 
 	if n.otherValue != nil {
-		var oms []*ObtainMethod
-		for _, o := range n.otherValue.obtainMethods {
-
-			var od []*ObtainMethodData
-			for _, data := range o.data {
-				od = append(od, &ObtainMethodData{
-					Name:      data.name,
-					Locations: data.locations,
-				})
-			}
-
-			oms = append(oms, &ObtainMethod{
-				Data: od,
-				Type: o.obtainType,
-			})
-		}
-
-		c.Obtain = oms
+		c.Obtain = getObtainMethods(n.otherValue)
 	}
 }
 
-func (c *GatheringIngredient) IncreaseQuantity(q int) { c.Quantity += q }
-func (c *GatheringIngredient) SetValue(n *treeNode) {
+func (c *GatheringIngredient) setValue(n *treeNode) {
 	c.Type = &GatheringType{
-		Icon: n.gatheringValue.gatherType.icon,
-		Name: n.gatheringValue.gatherType.name,
+		Icon: n.gatheringValue.gatherType.Icon,
+		Name: n.gatheringValue.gatherType.Name,
 	}
 
 	if n.otherValue != nil {
-		var oms []*ObtainMethod
-		for _, o := range n.otherValue.obtainMethods {
-
-			var od []*ObtainMethodData
-			for _, data := range o.data {
-				od = append(od, &ObtainMethodData{
-					Name:      data.name,
-					Locations: data.locations,
-				})
-			}
-
-			oms = append(oms, &ObtainMethod{
-				Data: od,
-				Type: o.obtainType,
-			})
-		}
-
-		c.Obtain = oms
+		c.Obtain = getObtainMethods(n.otherValue)
 	}
 }
 
-func (c *OtherIngredient) IncreaseQuantity(q int) { c.Quantity += q }
-func (c *OtherIngredient) SetValue(n *treeNode) {
-	var oms []*ObtainMethod
-	for _, o := range n.otherValue.obtainMethods {
-
-		var od []*ObtainMethodData
-		for _, data := range o.data {
-			od = append(od, &ObtainMethodData{
-				Name:      data.name,
-				Locations: data.locations,
-			})
-		}
-
-		oms = append(oms, &ObtainMethod{
-			Data: od,
-			Type: o.obtainType,
-		})
+func (c *OtherIngredient) setValue(n *treeNode) {
+	if n.otherValue != nil {
+		c.Obtain = getObtainMethods(n.otherValue)
 	}
-
-	c.Obtain = oms
 }
 
-func NewIngredient(n *treeNode) FinalIngredient {
+func NewIngredient(n *treeNode) ingredient {
 	ing := &Ingredient{
 		ID:       n.id,
 		Icon:     n.icon,
@@ -106,7 +104,6 @@ func NewIngredient(n *treeNode) FinalIngredient {
 		Quantity: n.requiredQuantity,
 	}
 
-	// TODO: implement crystals!!!
 	if n.isCrystal {
 		return &Crystal{ing}
 	}

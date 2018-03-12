@@ -36,11 +36,14 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func StartServer(port string) error {
+	initCachedSessions()
+
 	mux := http.NewServeMux()
 
 	mux.Handle("/web/assets/", http.StripPrefix("/web/assets/", http.FileServer(http.Dir("web/assets"))))
 	mux.HandleFunc("/", rootHandler)
 	mux.HandleFunc("/search", searchHandler)
+	mux.HandleFunc("/craftinglist", craftingListHandler)
 	mux.HandleFunc("/recipe/", recipeHandler)
 
 	return http.ListenAndServe(port, &server{mux})
@@ -52,10 +55,14 @@ type templateData struct {
 	data  interface{}
 }
 
-type templateDataFunc func(r *http.Request) (templateData, error)
+type templateDataFunc func(r *http.Request, s *Session) (templateData, error)
 
 func handle(w http.ResponseWriter, r *http.Request, f templateDataFunc) {
-	td, err := f(r)
+	s := GetSession(r)
+	if s == nil {
+		s = AddSessionCookie(w)
+	}
+	td, err := f(r, s)
 	if err != nil {
 		log.Fatalf("error with template %s. %s", td.name, err)
 	}
@@ -70,18 +77,18 @@ func handle(w http.ResponseWriter, r *http.Request, f templateDataFunc) {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	f := templateDataFunc(func(r *http.Request) (templateData, error) {
+	f := func(r *http.Request, s *Session) (templateData, error) {
 		return templateData{
 			files: []string{"base.html", "search/search-results.tmpl"},
 			name:  "base",
 			data:  nil,
 		}, nil
-	})
+	}
 	handle(w, r, f)
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
-	f := templateDataFunc(func(r *http.Request) (templateData, error) {
+	f := func(r *http.Request, s *Session) (templateData, error) {
 		searchValue := r.FormValue("search")
 		results, err := searchRecipes(searchValue)
 		return templateData{
@@ -89,22 +96,37 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			name:  "search",
 			data:  results,
 		}, err
-	})
+	}
 	handle(w, r, f)
 }
 
 func recipeHandler(w http.ResponseWriter, r *http.Request) {
-	f := templateDataFunc(func(r *http.Request) (templateData, error) {
+	f := func(r *http.Request, s *Session) (templateData, error) {
 		strID := r.URL.Path[len("/recipe/"):]
 		id, _ := strconv.Atoi(strID)
 		recipe, err := xivdb.GetRecipe(id)
-		cl := crafttree.GetCraftingListFor([]int{recipe.Item.ID})
+
+		s.CraftingList = append(s.CraftingList, recipe.Item.ID)
+
+		cl := crafttree.GetCraftingListFor(s.CraftingList)
 		return templateData{
 			files: []string{"craftlist/craftinglist.tmpl", "craftlist/other-obtain-methods.tmpl"},
 			name:  "craftinglist",
 			data:  cl,
 		}, err
-	})
+	}
+	handle(w, r, f)
+}
+
+func craftingListHandler(w http.ResponseWriter, r *http.Request) {
+	f := func(r *http.Request, s *Session) (templateData, error) {
+		cl := crafttree.GetCraftingListFor(s.CraftingList)
+		return templateData{
+			files: []string{"craftlist/craftinglist.tmpl", "craftlist/other-obtain-methods.tmpl"},
+			name:  "craftinglist",
+			data:  cl,
+		}, nil
+	}
 	handle(w, r, f)
 }
 

@@ -20,13 +20,7 @@ const (
 )
 
 type craftingList struct {
-	ingredients map[int]FinalIngredient
-}
-
-func init() {
-	initializeClassesMap()
-	initializeCrystalsMap()
-	initializeGatheringTypesMap()
+	ingredients map[int]ingredient
 }
 
 func GetCraftingListFor(ids []int) *CraftingList {
@@ -40,7 +34,7 @@ func GetCraftingListFor(ids []int) *CraftingList {
 	}
 
 	cl := craftingList{
-		ingredients: make(map[int]FinalIngredient),
+		ingredients: make(map[int]ingredient),
 	}
 	for _, tree := range trees {
 		cl.visitTree(tree, 1)
@@ -75,10 +69,10 @@ func GetCraftingListFor(ids []int) *CraftingList {
 func (cl *craftingList) visitTree(n *treeNode, quantity int) {
 	newQuantity := quantity * n.requiredQuantity
 	if val, ok := cl.ingredients[n.id]; ok {
-		val.IncreaseQuantity(newQuantity)
+		val.increaseQuantity(newQuantity)
 	} else {
 		i := NewIngredient(n)
-		i.SetValue(n)
+		i.setValue(n)
 		cl.ingredients[n.id] = i
 	}
 

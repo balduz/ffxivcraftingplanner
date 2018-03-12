@@ -9,14 +9,18 @@ addToCraftingListFunction = function(e) {
     $('#crafting-list').append(copy);
 
     const id = elem.data("id");
-    $.get('/recipe/' + id, function(data) {
-      $('#gathering-mats-list').append(data);
-
-      $('.ingredients-modal').click(function() {
-        $('#exampleModalCenter').modal();
-      });
-    });
+    $.get('/recipe/' + id);
   }
+}
+
+showCraftingList = function(e) {
+  $.get('/craftinglist', function(data) {
+    $('#gathering-mats-list').append(data);
+
+    $('.ingredients-modal').click(function() {
+      $('#exampleModalCenter').modal();
+    });
+  });
 }
 
 removeFunction = function(e) {
@@ -26,6 +30,7 @@ removeFunction = function(e) {
 
 // Register click functions.
 $('.btn-primary').on('click', addToCraftingListFunction);
+$('#required-mats-tab').on('click', showCraftingList);
 $('#crafting-list > .btn-danger').on('click', removeFunction);
 
 $('#item-search-form').on('submit', function(e) {

@@ -1,13 +1,15 @@
 package crafttree
 
 import (
-	"ffxivcraftingplanner/xivdb"
 	"fmt"
 	"log"
+
+	"ffxivcraftingplanner/gamedata"
+	"ffxivcraftingplanner/xivdb"
 )
 
 type craftingClass struct {
-	class *class
+	class *gamedata.Class
 	level int
 }
 
@@ -17,7 +19,7 @@ type craftingNode struct {
 	classes     []*craftingClass
 }
 type gatheringData struct {
-	gatherType *gatherType
+	gatherType *gamedata.GatherType
 	kind       string
 	nodes      []*gatheringNode
 }
@@ -64,7 +66,7 @@ func buildGatheringData(i *xivdb.Item) (*gatheringData, error) {
 		})
 	}
 
-	gt := getGatheringType(i.Gathering[0].Kind)
+	gt := gamedata.GetGatheringType(i.Gathering[0].Kind)
 	if gt == nil {
 		log.Fatalf("could not get gathering type for %d, type: %s", i.ID, i.Gathering[0].Kind)
 	}
@@ -105,7 +107,7 @@ func buildCraftingNode(i *xivdb.Item) *craftingNode {
 
 	var classes []*craftingClass
 	for _, recipe := range i.CraftingRecipe {
-		if c := getClass(recipe.ClassName); c != nil {
+		if c := gamedata.GetClass(recipe.ClassName); c != nil {
 			classes = append(classes, &craftingClass{
 				level: recipe.RequiredLevel,
 				class: c,
@@ -119,11 +121,11 @@ func buildCraftingNode(i *xivdb.Item) *craftingNode {
 }
 
 func buildTreeNode(id, quantity int) (*treeNode, error) {
-	if c := getCrystal(id); c != nil {
+	if c := gamedata.GetCrystal(id); c != nil {
 		return &treeNode{
 			id:               id,
-			name:             c.name,
-			icon:             c.icon,
+			name:             c.Name,
+			icon:             c.Icon,
 			requiredQuantity: quantity,
 			isCrystal:        true,
 		}, nil

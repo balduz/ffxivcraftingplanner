@@ -45,6 +45,27 @@ func getLocations(points []*xivdb.MapPoint) []*location {
 	return locations
 }
 
+func getObtainMethods(other *otherNode) []*ObtainMethod {
+	var oms []*ObtainMethod
+	for _, o := range other.obtainMethods {
+
+		var od []*ObtainMethodData
+		for _, data := range o.data {
+			od = append(od, &ObtainMethodData{
+				Name:      data.name,
+				Locations: data.locations,
+			})
+		}
+
+		oms = append(oms, &ObtainMethod{
+			Data: od,
+			Type: o.obtainType,
+		})
+	}
+
+	return oms
+}
+
 type mapDataGetter interface {
 	GetMapData() (*xivdb.MapData, error)
 }
