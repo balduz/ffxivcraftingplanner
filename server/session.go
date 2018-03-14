@@ -14,6 +14,7 @@ const appCookie = "ffxivcrafting-session"
 const minRandom = 0
 const maxRandom = ^uint64(0)
 
+// Session contains data about a user session.
 type Session struct {
 	ID           uint64
 	CraftingList []int
