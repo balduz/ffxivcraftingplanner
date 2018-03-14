@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 )
 
 const (
@@ -21,9 +22,13 @@ type xivdbRecipesCache map[int]*Recipe
 
 type jsonToXivdbFunc func(*http.Response) (interface{}, error)
 
-var itemsCache xivdbItemsCache
-var enemiesCache xivdbEnemiesCache
-var recipesCache xivdbRecipesCache
+var itemsCache2 xivdbItemsCache
+var enemiesCache2 xivdbEnemiesCache
+var recipesCache2 xivdbRecipesCache
+
+var itemsCache sync.Map
+var enemiesCache sync.Map
+var recipesCache sync.Map
 
 // apiDataCache provides methods to fetch an element from cache given its id if
 // available, and to save to cache if it was not found.
@@ -61,9 +66,9 @@ func (c xivdbRecipesCache) save(id int, data interface{}) {
 
 // init initializes the different caches.
 func init() {
-	itemsCache = make(xivdbItemsCache)
-	enemiesCache = make(xivdbEnemiesCache)
-	recipesCache = make(xivdbRecipesCache)
+	itemsCache2 = make(xivdbItemsCache)
+	enemiesCache2 = make(xivdbEnemiesCache)
+	recipesCache2 = make(xivdbRecipesCache)
 }
 
 // getFromXivdb retrieves from the XIVDB API the interface{} from the given url,
@@ -86,8 +91,8 @@ func getFromXivdb(url string, parseFunc jsonToXivdbFunc) (interface{}, error) {
 
 // getFromXivdb retrieves from the Xivdb API the interface{} with the given id,
 // trying to catch it from cache first.
-func getFromXivdbOrCache(c apiDataCache, url string, id int, parseFunc jsonToXivdbFunc) (interface{}, error) {
-	if data, ok := c.get(id); ok {
+func getFromXivdbOrCache(c sync.Map, url string, id int, parseFunc jsonToXivdbFunc) (interface{}, error) {
+	if data, ok := c.Load(id); ok {
 		return data, nil
 	}
 
@@ -96,7 +101,7 @@ func getFromXivdbOrCache(c apiDataCache, url string, id int, parseFunc jsonToXiv
 		return nil, err
 	}
 
-	c.save(id, result)
+	c.Store(id, result)
 	return result, nil
 }
 
