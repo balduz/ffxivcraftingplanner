@@ -15,61 +15,11 @@ const (
 	apiSearchRecipesURL = "http://api.xivdb.com/search?string=%s&one=recipes"
 )
 
-// If an item is required multiple times, just query the API once.
-type xivdbItemsCache map[int]*Item
-type xivdbEnemiesCache map[int]*Enemy
-type xivdbRecipesCache map[int]*Recipe
-
 type jsonToXivdbFunc func(*http.Response) (interface{}, error)
-
-var itemsCache2 xivdbItemsCache
-var enemiesCache2 xivdbEnemiesCache
-var recipesCache2 xivdbRecipesCache
 
 var itemsCache sync.Map
 var enemiesCache sync.Map
 var recipesCache sync.Map
-
-// apiDataCache provides methods to fetch an element from cache given its id if
-// available, and to save to cache if it was not found.
-type apiDataCache interface {
-	get(int) (interface{}, bool)
-	save(int, interface{})
-}
-
-func (c xivdbItemsCache) get(id int) (interface{}, bool) {
-	data, ok := c[id]
-	return data, ok
-}
-
-func (c xivdbEnemiesCache) get(id int) (interface{}, bool) {
-	data, ok := c[id]
-	return data, ok
-}
-
-func (c xivdbRecipesCache) get(id int) (interface{}, bool) {
-	data, ok := c[id]
-	return data, ok
-}
-
-func (c xivdbItemsCache) save(id int, data interface{}) {
-	c[id] = data.(*Item)
-}
-
-func (c xivdbEnemiesCache) save(id int, data interface{}) {
-	c[id] = data.(*Enemy)
-}
-
-func (c xivdbRecipesCache) save(id int, data interface{}) {
-	c[id] = data.(*Recipe)
-}
-
-// init initializes the different caches.
-func init() {
-	itemsCache2 = make(xivdbItemsCache)
-	enemiesCache2 = make(xivdbEnemiesCache)
-	recipesCache2 = make(xivdbRecipesCache)
-}
 
 // getFromXivdb retrieves from the XIVDB API the interface{} from the given url,
 // parsing the JSON with the given parsing function.
