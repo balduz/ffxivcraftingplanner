@@ -36,8 +36,6 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func StartServer(port string) error {
-	initCachedSessions()
-
 	mux := http.NewServeMux()
 
 	mux.Handle("/web/assets/", http.StripPrefix("/web/assets/", http.FileServer(http.Dir("web/assets"))))

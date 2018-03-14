@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -18,11 +19,7 @@ type Session struct {
 	CraftingList []int
 }
 
-var cachedSessions map[uint64]*Session
-
-func initCachedSessions() {
-	cachedSessions = make(map[uint64]*Session)
-}
+var cachedSessions sync.Map
 
 func GetSession(r *http.Request) *Session {
 	c, err := r.Cookie(appCookie)
@@ -33,8 +30,8 @@ func GetSession(r *http.Request) *Session {
 	if err != nil {
 		log.Fatalf("GetSession(_): unknown cookie value %s, error: %s", c.Value, err)
 	}
-	if s, ok := cachedSessions[id]; ok {
-		return s
+	if s, ok := cachedSessions.Load(id); ok {
+		return s.(*Session)
 	}
 	return nil
 }
@@ -49,7 +46,7 @@ func AddSessionCookie(w http.ResponseWriter) *Session {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 	cookie := http.Cookie{Name: appCookie, Value: fmt.Sprintf("%d", id), Expires: expiration}
 	http.SetCookie(w, &cookie)
-	cachedSessions[id] = s
+	cachedSessions.Store(id, s)
 	return s
 }
 
