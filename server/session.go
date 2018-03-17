@@ -6,32 +6,33 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
+
+	"ffxivcraftingplanner/cache"
 )
 
 const appCookie = "ffxivcrafting-session"
 const minRandom = 0
-const maxRandom = ^uint64(0)
+const maxRandom = ^int(0)
 
 // Session contains data about a user session.
 type Session struct {
-	ID           uint64
+	ID           int
 	CraftingList []int
 }
 
-var cachedSessions sync.Map
+var cachedSessions = cache.NewStorage()
 
 func GetSession(r *http.Request) *Session {
 	c, err := r.Cookie(appCookie)
 	if err != nil {
 		return nil
 	}
-	id, err := strconv.ParseUint(c.Value, 10, 64)
+	id, err := strconv.Atoi(c.Value)
 	if err != nil {
 		log.Fatalf("GetSession(_): unknown cookie value %s, error: %s", c.Value, err)
 	}
-	if s, ok := cachedSessions.Load(id); ok {
+	if s, ok := cachedSessions.Get(id); ok {
 		return s.(*Session)
 	}
 	return nil
@@ -47,10 +48,10 @@ func AddSessionCookie(w http.ResponseWriter) *Session {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 	cookie := http.Cookie{Name: appCookie, Value: fmt.Sprintf("%d", id), Expires: expiration}
 	http.SetCookie(w, &cookie)
-	cachedSessions.Store(id, s)
+	cachedSessions.Set(id, s)
 	return s
 }
 
-func generateSessionID() uint64 {
-	return rand.Uint64()
+func generateSessionID() int {
+	return rand.Int()
 }

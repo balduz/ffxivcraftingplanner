@@ -1,3 +1,4 @@
+go install ./cache
 go install ./xivdb
 go install ./crafttree
 go install ./helper

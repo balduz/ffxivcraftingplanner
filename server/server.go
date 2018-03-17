@@ -99,21 +99,24 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func recipeHandler(w http.ResponseWriter, r *http.Request) {
-	f := func(r *http.Request, s *Session) (templateData, error) {
-		strID := r.URL.Path[len("/recipe/"):]
-		id, _ := strconv.Atoi(strID)
-		recipe, err := xivdb.GetRecipe(id)
-
-		s.CraftingList = append(s.CraftingList, recipe.Item.ID)
-
-		cl := crafttree.GetCraftingListFor(s.CraftingList)
-		return templateData{
-			files: []string{"craftlist/craftinglist.tmpl", "craftlist/other-obtain-methods.tmpl"},
-			name:  "craftinglist",
-			data:  cl,
-		}, err
+	s := GetSession(r)
+	if s == nil {
+		s = AddSessionCookie(w)
 	}
-	handle(w, r, f)
+
+	strID := r.URL.Path[len("/recipe/"):]
+	id, _ := strconv.Atoi(strID)
+	recipe, err := xivdb.GetRecipe(id)
+
+	if err != nil {
+		log.Printf("error getting recipe %d. %s", id, err)
+	}
+
+	s.CraftingList = append(s.CraftingList, recipe.Item.ID)
+
+	// Not use the results here, but call the function nevertheless to set all the
+	// caches.
+	crafttree.GetCraftingListFor(s.CraftingList)
 }
 
 func craftingListHandler(w http.ResponseWriter, r *http.Request) {

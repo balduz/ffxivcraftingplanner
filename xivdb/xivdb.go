@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
+
+	"ffxivcraftingplanner/cache"
 )
 
 const (
@@ -17,9 +18,9 @@ const (
 
 type jsonToXivdbFunc func(*http.Response) (interface{}, error)
 
-var itemsCache sync.Map
-var enemiesCache sync.Map
-var recipesCache sync.Map
+var itemsCache = cache.NewStorage()
+var enemiesCache = cache.NewStorage()
+var recipesCache = cache.NewStorage()
 
 // getFromXivdb retrieves from the XIVDB API the interface{} from the given url,
 // parsing the JSON with the given parsing function.
@@ -41,8 +42,8 @@ func getFromXivdb(url string, parseFunc jsonToXivdbFunc) (interface{}, error) {
 
 // getFromXivdb retrieves from the Xivdb API the interface{} with the given id,
 // trying to catch it from cache first.
-func getFromXivdbOrCache(c sync.Map, url string, id int, parseFunc jsonToXivdbFunc) (interface{}, error) {
-	if data, ok := c.Load(id); ok {
+func getFromXivdbOrCache(s cache.Storage, url string, id int, parseFunc jsonToXivdbFunc) (interface{}, error) {
+	if data, ok := s.Get(id); ok {
 		return data, nil
 	}
 
@@ -51,7 +52,7 @@ func getFromXivdbOrCache(c sync.Map, url string, id int, parseFunc jsonToXivdbFu
 		return nil, err
 	}
 
-	c.Store(id, result)
+	s.Set(id, result)
 	return result, nil
 }
 
