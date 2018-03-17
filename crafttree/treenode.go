@@ -152,7 +152,7 @@ func buildTreeNode(id, quantity int) (*treeNode, error) {
 
 		var children []*treeNode
 		for _, ingr := range data.CraftingRecipe[0].Tree {
-			tn, err := buildTreeNode(ingr.ID, ingr.Quantity)
+			tn, err := buildTreeNode(ingr.ID, quantity*ingr.Quantity)
 			if err != nil {
 				log.Printf("error in buildtreeNode: %s", err)
 			}
