@@ -1,6 +1,9 @@
 package crafttree
 
-import "log"
+import (
+	"log"
+	"sort"
+)
 
 type ObtainType int
 
@@ -23,6 +26,12 @@ type craftingList struct {
 	ingredients map[int]ingredient
 }
 
+type byTier []*PreCraft
+
+func (a byTier) Len() int           { return len(a) }
+func (a byTier) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byTier) Less(i, j int) bool { return a[i].Tier > a[j].Tier }
+
 func GetCraftingListFor(ids []int) *CraftingList {
 	var trees []*treeNode
 	for _, id := range ids {
@@ -37,7 +46,7 @@ func GetCraftingListFor(ids []int) *CraftingList {
 		ingredients: make(map[int]ingredient),
 	}
 	for _, tree := range trees {
-		cl.visitTree(tree, 1)
+		cl.visitTree(tree, 1, 1)
 	}
 
 	c := []*Crystal{}
@@ -58,6 +67,8 @@ func GetCraftingListFor(ids []int) *CraftingList {
 		}
 	}
 
+	sort.Sort(byTier(pc))
+
 	return &CraftingList{
 		Crystals:  c,
 		PreCrafts: pc,
@@ -66,17 +77,18 @@ func GetCraftingListFor(ids []int) *CraftingList {
 	}
 }
 
-func (cl *craftingList) visitTree(n *treeNode, quantity int) {
+func (cl *craftingList) visitTree(n *treeNode, quantity, tier int) {
 	newQuantity := quantity * n.requiredQuantity
 	if val, ok := cl.ingredients[n.id]; ok {
 		val.increaseQuantity(newQuantity)
+		val.setTier(tier)
 	} else {
-		i := NewIngredient(n)
+		i := NewIngredient(n, tier)
 		i.setValue(n)
 		cl.ingredients[n.id] = i
 	}
 
 	for _, child := range n.children {
-		cl.visitTree(child, newQuantity)
+		cl.visitTree(child, newQuantity, tier+1)
 	}
 }

@@ -5,6 +5,7 @@ type Ingredient struct {
 	Icon     string
 	Name     string
 	Quantity int
+	Tier     int
 }
 
 type ObtainMethodData struct {
@@ -53,10 +54,17 @@ type OtherIngredient struct {
 type ingredient interface {
 	setValue(*treeNode)
 	increaseQuantity(int)
+	setTier(int)
 }
 
 func (ing *Ingredient) increaseQuantity(q int) {
 	ing.Quantity += q
+}
+
+func (ing *Ingredient) setTier(t int) {
+	if ing.Tier < t {
+		ing.Tier = t
+	}
 }
 
 func (c *Crystal) setValue(n *treeNode) {
@@ -96,12 +104,13 @@ func (c *OtherIngredient) setValue(n *treeNode) {
 	}
 }
 
-func NewIngredient(n *treeNode) ingredient {
+func NewIngredient(n *treeNode, tier int) ingredient {
 	ing := &Ingredient{
 		ID:       n.id,
 		Icon:     n.icon,
 		Name:     n.name,
 		Quantity: n.requiredQuantity,
+		Tier:     tier,
 	}
 
 	if n.isCrystal {
